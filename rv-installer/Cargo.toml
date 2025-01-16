@@ -1,0 +1,9 @@
+[package]
+name = "retroveneer-installer"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+dirs = "5.0.1"
+tokio = { version = "1.42.0", features = ["full"] }
+raylib = { version = "5.0.2" }
