@@ -15,7 +15,7 @@ function yes_or_no {
 }
 
 is_update='FALSE'
-if [ $1 = '--update' ]; then
+if [ "$1" = '--update' ]; then
     is_update='TRUE'
 fi
 
