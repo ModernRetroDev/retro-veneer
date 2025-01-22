@@ -1,4 +1,6 @@
-rv-installer/retroveneer-installer-0.0.1-x86_64.AppImage
-rv-installer/retroveneer-installer-0.0.1-x86_64.AppImage.zsync
-rv-ui/retroveneer-ui-0.0.1-x86_64.AppImage
-rv-ui/retroveneer-ui-0.0.1-x86_64.AppImage.zsync
+rv-installer/retroveneer-installer-x86_64.AppImage
+rv-ui/retroveneer-ui-x86_64.AppImage
+rv-installer/AppDir/
+rv-ui/AppDir/
+rv-installer/target/
+rv-ui/target/
