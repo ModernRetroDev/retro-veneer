@@ -1,5 +1,5 @@
-rv-installer/retroveneer-installer-x86_64.AppImage
-rv-ui/retroveneer-ui-x86_64.AppImage
+rv-installer/*.AppImage
+rv-ui/*.AppImage
 rv-installer/AppDir/
 rv-ui/AppDir/
 rv-installer/target/
