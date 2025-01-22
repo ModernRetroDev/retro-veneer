@@ -115,8 +115,28 @@ fi
 #------------------------------------------------------------------------------#
 # Get and launch the retroveneer installer                                     #
 #------------------------------------------------------------------------------#
+thisArch=`uname -m`
+supportedArch='FALSE'
+if [ "$ThisArch" = 'x86_64' ]; then
+    supportedArch='TRUE'
+fi
+if [ "$ThisArch" = 'aarch64' ]; then
+    supportedArch='TRUE'
+fi
+
+if [ "$supportedArch" = 'FALSE' ]; then
+        echo '#==============================================================================#'
+        echo '#                                  E R R O R                                   #'
+        echo '#==============================================================================#'
+        echo '#                                                                              #'
+        echo '# This is currently an unsupported architecture. Aborting installation...      #'
+        echo '#                                                                              #'
+        echo '#==============================================================================#'
+        exit 1
+fi
+
 tempdir=`mktemp -d`
-appimagename='retroveneer-installer-x86_64.AppImage'
+appimagename="retroveneer-installer-${thisArch}.AppImage"
 appimagepath="${tempdir}/${appimagename}"
 remotepath="${http_base_loc}/${appimagename}"
 echo "Downloading installer from \`${remotepath}\`..."
