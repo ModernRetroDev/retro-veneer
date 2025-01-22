@@ -161,8 +161,8 @@ fn get_emu_tic80() -> bool {
 fn get_retrovaneer_ui() -> bool {
     let appimg_addr: String;
     let appimg_fname: String;
-    let relpath: &str = 
-        "http://192.168.0.251:8000/";
+    let relpath: &str =
+        "https://raw.githubusercontent.com/ModernRetroDev/retro-veneer/refs/heads/master/hosted/";
 
     unsafe {
         STEP_NEXT = "Installing RetroVeneer UI...".to_string();
