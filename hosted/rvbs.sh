@@ -117,10 +117,10 @@ fi
 #------------------------------------------------------------------------------#
 thisArch=`uname -m`
 supportedArch='FALSE'
-if [ "$ThisArch" = 'x86_64' ]; then
+if [ "$thisArch" = 'x86_64' ]; then
     supportedArch='TRUE'
 fi
-if [ "$ThisArch" = 'aarch64' ]; then
+if [ "$thisArch" = 'aarch64' ]; then
     supportedArch='TRUE'
 fi
 
