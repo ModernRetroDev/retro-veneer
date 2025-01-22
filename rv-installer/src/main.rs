@@ -173,10 +173,10 @@ fn get_retrovaneer_ui() -> bool {
     //------------------------------------------------------------------------//
     match std::env::consts::ARCH {
         "x86_64" => {
-            appimg_fname = "retroveneer-ui-0.0.1-x86_64.AppImage".to_string();
+            appimg_fname = "retroveneer-ui-x86_64.AppImage".to_string();
         },
         "aarch64" => {
-            appimg_fname = "retroveneer-ui-0.0.1-aarch64.AppImage".to_string();
+            appimg_fname = "retroveneer-ui-aarch64.AppImage".to_string();
         },
         _ => {
             println!("Unsupported architecture! Aborting!!!");

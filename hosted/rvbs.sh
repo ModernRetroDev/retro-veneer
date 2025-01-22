@@ -116,7 +116,7 @@ fi
 # Get and launch the retroveneer installer                                     #
 #------------------------------------------------------------------------------#
 tempdir=`mktemp -d`
-appimagename='retroveneer-installer-0.0.1-x86_64.AppImage'
+appimagename='retroveneer-installer-x86_64.AppImage'
 appimagepath="${tempdir}/${appimagename}"
 remotepath="${http_base_loc}/${appimagename}"
 echo "Downloading installer from \`${remotepath}\`..."
