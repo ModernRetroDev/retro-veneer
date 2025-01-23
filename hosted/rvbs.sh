@@ -135,7 +135,28 @@ if [ "$supportedArch" = 'FALSE' ]; then
         exit 1
 fi
 
+#------------------------------------------------------------------------------#
+# Get and check the state of `install_freeze` before continuing.               #
+#------------------------------------------------------------------------------#
 tempdir=`mktemp -d`
+remotepath="${http_base_loc}/install_freeze"
+freezepath="${tempdir}/install_freeze"
+wget -P "$tempdir" -q "$remotepath"
+inst_frozen=`grep TRUE ${freezepath} | wc -l`
+if [ "$inst_frozen" = '1' ]; then
+        echo '#==============================================================================#'
+        echo '#                                  E R R O R                                   #'
+        echo '#==============================================================================#'
+        echo '#                                                                              #'
+        echo '# Installation Process Currently Frozen: Please try again later.               #'
+        echo '#                                                                              #'
+        echo '# This likely means that updates are being actively made to the install        #'
+        echo '# process of RetroVeneer. Wait an hour or so and try to install again.         #'
+        echo '#                                                                              #'
+        echo '#==============================================================================#'
+        exit 1
+fi
+
 appimagename="retroveneer-installer-${thisArch}.AppImage"
 appimagepath="${tempdir}/${appimagename}"
 remotepath="${http_base_loc}/${appimagename}"

@@ -61,8 +61,6 @@ enum UpdateSelection {
 static VERSION: &str = "0.1";
 static URL_RETROVENEER: &str = 
     "https://raw.githubusercontent.com/ModernRetroDev/retro-veneer/refs/heads/master/hosted";
-// static URL_RV_CURRENT_VERSION: &str = 
-//     "http://192.168.0.251:8000/current_version";
 
 static mut COUNTDOWN_TICS: u8 = 0;
 static mut COUNTDOWN_SECONDS: u8 = 9;
@@ -82,7 +80,8 @@ static mut SPINNER:      u8 = 0;
 static mut SPINNER_NEXT: u8 = 0;
 static mut AUTOSTART_ENABLED: bool = false;
 static mut UPDATES_AVAILABLE: bool = false;
-static mut NETWORKING_ERROR: bool = false;
+static mut NETWORKING_ERROR:  bool = false;
+static mut INSTALL_FREEZE:    bool = false;
 
 
 fn glob_get_platform_selection() -> PlatformSelection {
@@ -122,8 +121,6 @@ fn config_get_platform() -> PlatformSelection {
     }
 
     let contents = fs::read_to_string(&cfg_platform).unwrap();
-
-    println!("`{}`", &contents);
 
     match contents.as_ref() {
         "CommanderX16\n" => {
@@ -220,18 +217,23 @@ fn remove_rv_running_file() {
 }
 
 fn updates_are_available() -> bool {
-    let homedir = format!("{}", dirs::home_dir().unwrap().display());
-    let temp_path = format!("{homedir}/retroveneer/.temp");
-    let vers_path = format!("{temp_path}/current_version");
+    let homedir     = format!("{}", dirs::home_dir().unwrap().display());
+    let temp_path   = format!("{homedir}/retroveneer/.temp");
+    let vers_path   = format!("{temp_path}/current_version");
+    let freeze_path = format!("{temp_path}/install_freeze");
+    let url_freeze  = format!("{URL_RETROVENEER}/install_freeze");
     let url_version = format!("{URL_RETROVENEER}/current_version");
 
     fs::create_dir_all(&temp_path).unwrap();
 
     let _ = Command::new("sh")
         .arg("-c")
-        .arg(format!("rm -f {}", vers_path))
+        .arg(format!("rm -f {vers_path} {freeze_path}"))
         .output();
 
+    //------------------------------------------------------------------------//
+    // Grab the latest version number of RV from the server.                  //
+    //------------------------------------------------------------------------//
     let _ = Command::new("sh")
         .arg("-c")
         .arg(format!("wget {url_version} -P {temp_path}"))
@@ -245,12 +247,30 @@ fn updates_are_available() -> bool {
         return false;
     }
 
+    //------------------------------------------------------------------------//
+    // Grab the install_freeze file from the server.                          //
+    //------------------------------------------------------------------------//
+    let _ = Command::new("sh")
+        .arg("-c")
+        .arg(format!("wget {url_freeze} -P {temp_path}"))
+        .output();
+
+    if Path::new(&freeze_path).exists() {
+        let contents = fs::read_to_string(&freeze_path).unwrap();
+
+        if &contents == "TRUE\n" {
+            unsafe {
+                INSTALL_FREEZE = true;
+            }
+            return false;
+        }
+    }
+
     let contents = fs::read_to_string(&vers_path).unwrap();
 
     if &contents != VERSION {
         return true;
     }
-    println!("`{}`", &contents);
     return false;
 }
 
@@ -1297,6 +1317,7 @@ fn mode_update_everything(rl: &mut RaylibHandle, thread: &RaylibThread) {
     let spinnertxt: String;
     let netwk_err: bool;
     let updates_avail: bool;
+    let update_freeze: bool;
     let mut selection: UpdateSelection;
     let mut selection_new: Option<UpdateSelection> = None;
     let spinner_x: i32 =  16;
@@ -1323,6 +1344,7 @@ fn mode_update_everything(rl: &mut RaylibHandle, thread: &RaylibThread) {
     unsafe {
         netwk_err     = NETWORKING_ERROR;
         updates_avail = UPDATES_AVAILABLE;
+        update_freeze = INSTALL_FREEZE;
     }
     selection = glob_get_update_selection();
 
@@ -1389,6 +1411,12 @@ fn mode_update_everything(rl: &mut RaylibHandle, thread: &RaylibThread) {
     if netwk_err {
         text_option = "Network Error: Unable to check for Updates.".to_string();
         d.draw_text(&text_option,  15+s_x, y_base+s_y, 20, Color::RED);
+    } else if update_freeze {
+        text_option = "Updates Currently Frozen: Try again later.".to_string();
+        d.draw_text(&text_option,  15+s_x, y_base+s_y, 20, Color::RED);
+
+        text_option = "* Updates are likely being made to the installers *".to_string();
+        d.draw_text(&text_option,  15+s_x, y_base+s_y+30, 20, Color::GRAY);
     } else if ! updates_avail {
         text_option = "Your RetroVeneer setup is up-to-date.".to_string();
         d.draw_text(&text_option,  15+s_x, y_base+s_y, 20, Color::WHITE);
