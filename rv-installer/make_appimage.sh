@@ -7,9 +7,9 @@ AppName='retroveneer-installer'
 AppVersion='0.0.1'
 
 if [ "$ThisArch" = 'aarch64' ]; then
-	bash cargo/select_unstable_build.sh
+	bash cargo/select_aarch64_build.sh
 else
-	bash cargo/select_stable_build.sh
+	bash cargo/select_other_build.sh
 fi
 
 #------------------------------------------------------------------------------#
@@ -22,7 +22,7 @@ cargo build --release
 #------------------------------------------------------------------------------#
 rm -rf ./AppDir || true
 mkdir -p ./AppDir/usr/bin
-cp target/release/rv-installer ./AppDir/usr/bin
+cp target/release/retroveneer-installer ./AppDir/usr/bin
 cp ../retroveneer.png ./AppDir
 
 #------------------------------------------------------------------------------#

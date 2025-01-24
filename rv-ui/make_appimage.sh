@@ -7,9 +7,9 @@ AppName='retroveneer-ui'
 AppVersion='0.0.1'
 
 if [ "$ThisArch" = 'aarch64' ]; then
-	bash cargo/select_unstable_build.sh
+	bash cargo/select_aarch64_build.sh
 else
-	bash cargo/select_stable_build.sh
+	bash cargo/select_other_build.sh
 fi
 
 #------------------------------------------------------------------------------#
