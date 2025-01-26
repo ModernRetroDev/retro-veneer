@@ -211,7 +211,7 @@ fn get_retrovaneer_ui() -> bool {
     //------------------------------------------------------------------------//
     let _ = Command::new("sh")
         .arg("-c")
-        .arg(format!("mv {} $HOME/retroveneer/retroveneer-ui.appimage", appimg_fname))
+        .arg(format!("mv {} $HOME/retroveneer/retroveneer.appimage", appimg_fname))
         .output();
 
     return false;
@@ -225,21 +225,32 @@ fn setup_autostart() {
     println!("autostart_path = `{}`", autostart_path);
     fs::create_dir_all(&autostart_path).unwrap();
 
-    let autostart_script = format!("{autostart_path}/retroveneer-ui.desktop");
-
-    let binpath_rv_ui = format!(
-        "{homedir}/retroveneer/retroveneer-ui.appimage");
+    let autostart_script = format!("{autostart_path}/retroveneer.desktop");
+    let binpath_rv_ui = format!("{homedir}/retroveneer");
 
     let mut autofile = File::create(autostart_script).unwrap();
 
     writeln!(&mut autofile, "[Desktop Entry]").unwrap();
-    writeln!(&mut autofile, "Name=RetroVeneer UI").unwrap();
-    writeln!(&mut autofile, "Comment=Starts up an emulator at login").unwrap();
     writeln!(&mut autofile, "Type=Application").unwrap();
-    writeln!(&mut autofile, "Exec={binpath_rv_ui}").unwrap();
+    writeln!(&mut autofile, "Version=0.1").unwrap();
+    writeln!(&mut autofile, "Name=RetroVeneer").unwrap();
+    writeln!(&mut autofile, "Comment=Manages an instance of RetroVeneer").unwrap();
+    writeln!(&mut autofile, "Exec=/home/pi/retroveneer/retroveneer.appimage").unwrap();
+    writeln!(&mut autofile, "Icon=/home/pi/retroveneer/retroveneer.png").unwrap();
     writeln!(&mut autofile, "Terminal=false").unwrap();
+    writeln!(&mut autofile, "Categories=Utility;Emulation;").unwrap();
+    writeln!(&mut autofile, "StartupNotify=true").unwrap();
 
     autofile.flush().unwrap();
+
+    //------------------------------------------------------------------------//
+    // Copy the .desktop file so that it shows up within launchers.           //
+    //------------------------------------------------------------------------//
+    let _ = Command::new("sh")
+        .arg("-c")
+        .arg(format!("cp {autostart_script} $HOME/.local/share/applications"))
+        .output();
+
 }
 
 async fn update_spinner() {

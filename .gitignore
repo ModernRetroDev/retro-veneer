@@ -1,6 +1,6 @@
-rv-installer/*.AppImage
-rv-ui/*.AppImage
-rv-installer/AppDir/
-rv-ui/AppDir/
-rv-installer/target/
-rv-ui/target/
+installer/*.AppImage
+retroveneer/*.AppImage
+installer/AppDir/
+retroveneer/AppDir/
+installer/target/
+retroveneer/target/
