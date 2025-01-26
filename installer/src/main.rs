@@ -236,6 +236,7 @@ fn setup_autostart() {
     fs::create_dir_all(&autostart_path).unwrap();
 
     let autostart_script = format!("{autostart_path}/retroveneer.desktop");
+    let retroveneer_path = format!("{homedir}/retroveneer");
 
     let mut autofile = File::create(&autostart_script).unwrap();
 
@@ -244,8 +245,8 @@ fn setup_autostart() {
     writeln!(&mut autofile, "Version=0.1").unwrap();
     writeln!(&mut autofile, "Name=RetroVeneer").unwrap();
     writeln!(&mut autofile, "Comment=Manages an instance of RetroVeneer").unwrap();
-    writeln!(&mut autofile, "Exec=/home/pi/retroveneer/retroveneer.appimage").unwrap();
-    writeln!(&mut autofile, "Icon=/home/pi/retroveneer/retroveneer.png").unwrap();
+    writeln!(&mut autofile, "Exec={retroveneer_path}/retroveneer.appimage").unwrap();
+    writeln!(&mut autofile, "Icon={retroveneer_path}/retroveneer.png").unwrap();
     writeln!(&mut autofile, "Terminal=false").unwrap();
     writeln!(&mut autofile, "Categories=Utility;Emulation;").unwrap();
     writeln!(&mut autofile, "StartupNotify=true").unwrap();
