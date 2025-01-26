@@ -2,8 +2,8 @@
 
 ThisArch=`uname -m`
 
-DesktopFile='./AppDir/retroveneer.ui.desktop'
-AppName='retroveneer-ui'
+DesktopFile='./AppDir/retroveneer.desktop'
+AppName='retroveneer'
 AppVersion='0.0.1'
 
 if [ "$ThisArch" = 'aarch64' ]; then
@@ -22,7 +22,7 @@ cargo build --release
 #------------------------------------------------------------------------------#
 rm -rf ./AppDir || true
 mkdir -p ./AppDir/usr/bin
-cp target/release/retroveneer-ui ./AppDir/usr/bin
+cp target/release/retroveneer ./AppDir/usr/bin
 cp ../retroveneer.png ./AppDir
 
 #------------------------------------------------------------------------------#
@@ -34,7 +34,7 @@ echo "X-AppImage-Version=${AppVersion}" >> $DesktopFile
 echo "X-AppImage-Name=${AppName}"       >> $DesktopFile
 echo "Name=${AppName}"                  >> $DesktopFile
 echo 'Path=/usr/bin'                    >> $DesktopFile
-echo 'Exec=retroveneer-ui'              >> $DesktopFile
+echo 'Exec=retroveneer'                 >> $DesktopFile
 echo 'Icon=retroveneer'                 >> $DesktopFile
 echo 'Type=Application'                 >> $DesktopFile
 echo 'Terminal=false'                   >> $DesktopFile
@@ -45,7 +45,7 @@ echo 'Comment=Manages an instance of RetroVeneer' >> $DesktopFile
 # Create an AppRun script                                                      #
 #------------------------------------------------------------------------------#
 linuxdeploy --appdir=./AppDir \
-	--executable=target/release/retroveneer-ui \
+	--executable=target/release/retroveneer \
 	--desktop-file=$DesktopFile \
-	--icon-file=../retroveneer.png \
+	--icon-file=../hosted/retroveneer.png \
 	--output=appimage

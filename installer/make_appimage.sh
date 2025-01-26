@@ -47,5 +47,5 @@ echo 'Comment=Installs/updates a RetroVeneer instance.' >> $DesktopFile
 linuxdeploy --appdir=./AppDir \
 	--executable=target/release/retroveneer-installer \
 	--desktop-file=$DesktopFile \
-	--icon-file=../retroveneer.png \
+	--icon-file=../hosted/retroveneer.png \
 	--output=appimage

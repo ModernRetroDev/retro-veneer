@@ -158,8 +158,8 @@ fn get_emu_tic80() -> bool {
     return false;
 }
 
-fn get_retrovaneer_ui() -> bool {
-    let appimg_addr: String;
+fn get_retroveneer() -> bool {
+    let mut appimg_addr: String;
     let appimg_fname: String;
     let relpath: &str =
         "https://raw.githubusercontent.com/ModernRetroDev/retro-veneer/refs/heads/master/hosted/";
@@ -173,10 +173,10 @@ fn get_retrovaneer_ui() -> bool {
     //------------------------------------------------------------------------//
     match std::env::consts::ARCH {
         "x86_64" => {
-            appimg_fname = "retroveneer-ui-x86_64.AppImage".to_string();
+            appimg_fname = "retroveneer-x86_64.AppImage".to_string();
         },
         "aarch64" => {
-            appimg_fname = "retroveneer-ui-aarch64.AppImage".to_string();
+            appimg_fname = "retroveneer-aarch64.AppImage".to_string();
         },
         _ => {
             println!("Unsupported architecture! Aborting!!!");
@@ -199,7 +199,7 @@ fn get_retrovaneer_ui() -> bool {
         .output();
 
     //------------------------------------------------------------------------//
-    // Make directory structure for the retroveneer-ui.                       //
+    // Make directory structure for retroveneer.                              //
     //------------------------------------------------------------------------//
     let _ = Command::new("sh")
         .arg("-c")
@@ -214,6 +214,16 @@ fn get_retrovaneer_ui() -> bool {
         .arg(format!("mv {} $HOME/retroveneer/retroveneer.appimage", appimg_fname))
         .output();
 
+    //------------------------------------------------------------------------//
+    // Grab a copy of the icon file for RetroVeneer.                          //
+    //------------------------------------------------------------------------//
+    appimg_addr = format!("{}retroveneer.png", relpath);
+
+    let _ = Command::new("sh")
+        .arg("-c")
+        .arg(format!("wget -P $HOME/retroveneer {}", appimg_addr))
+        .output();
+
     return false;
 }
 
@@ -226,9 +236,8 @@ fn setup_autostart() {
     fs::create_dir_all(&autostart_path).unwrap();
 
     let autostart_script = format!("{autostart_path}/retroveneer.desktop");
-    let binpath_rv_ui = format!("{homedir}/retroveneer");
 
-    let mut autofile = File::create(autostart_script).unwrap();
+    let mut autofile = File::create(&autostart_script).unwrap();
 
     writeln!(&mut autofile, "[Desktop Entry]").unwrap();
     writeln!(&mut autofile, "Type=Application").unwrap();
@@ -250,7 +259,6 @@ fn setup_autostart() {
         .arg("-c")
         .arg(format!("cp {autostart_script} $HOME/.local/share/applications"))
         .output();
-
 }
 
 async fn update_spinner() {
@@ -305,7 +313,7 @@ async fn install_in_bg() {
     if get_emu_tic80() {
         return
     }
-    if get_retrovaneer_ui() {
+    if get_retroveneer() {
         return
     }
     setup_autostart();
@@ -323,7 +331,7 @@ async fn install_in_bg() {
 async fn main() {
     let (mut rl, thread) = raylib::init()
         .size(640, 480)
-        .title("Retro Veneer Installer")
+        .title("RetroVeneer Installer")
         .build();
 
     tokio::spawn(update_spinner());
