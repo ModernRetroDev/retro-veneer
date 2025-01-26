@@ -157,7 +157,7 @@ if [ "$inst_frozen" = '1' ]; then
         exit 1
 fi
 
-appimagename="retroveneer-installer-${thisArch}.AppImage"
+appimagename="installer-${thisArch}.AppImage"
 appimagepath="${tempdir}/${appimagename}"
 remotepath="${http_base_loc}/${appimagename}"
 echo "Downloading installer from \`${remotepath}\`..."
@@ -172,4 +172,4 @@ rmdir $tempdir
 #------------------------------------------------------------------------------#
 # Launch RetroVeneer #
 #------------------------------------------------------------------------------#
-gio launch "${HOME}/.config/autostart/retroveneer-ui.desktop"
+gio launch "${HOME}/.config/autostart/retroveneer.desktop"
