@@ -105,7 +105,7 @@ fn glob_get_update_selection() -> UpdateSelection {
 fn autostart_is_enabled() -> bool {
     let homedir = format!("{}", dirs::home_dir().unwrap().display());
     let autostart_path = format!("{homedir}/.config/autostart");
-    let autostart_script = format!("{autostart_path}/retroveneer-ui.desktop");
+    let autostart_script = format!("{autostart_path}/retroveneer.desktop");
 
     return Path::new(&autostart_script).exists();
 }
@@ -143,19 +143,21 @@ fn enable_autostart() {
 
     fs::create_dir_all(&autostart_path).unwrap();
 
-    let autostart_script = format!("{autostart_path}/retroveneer-ui.desktop");
+    let autostart_script = format!("{autostart_path}/retroveneer.desktop");
+    let retroveneer_path = format!("{homedir}/retroveneer");
 
-    let binpath_rv_ui = format!(
-        "{homedir}/retroveneer/retroveneer-ui.appimage");
-
-    let mut autofile = File::create(autostart_script).unwrap();
+    let mut autofile = File::create(&autostart_script).unwrap();
 
     writeln!(&mut autofile, "[Desktop Entry]").unwrap();
-    writeln!(&mut autofile, "Name=RetroVeneer UI").unwrap();
-    writeln!(&mut autofile, "Comment=Starts up an emulator at login").unwrap();
     writeln!(&mut autofile, "Type=Application").unwrap();
-    writeln!(&mut autofile, "Exec={binpath_rv_ui}").unwrap();
+    writeln!(&mut autofile, "Version=0.1").unwrap();
+    writeln!(&mut autofile, "Name=RetroVeneer").unwrap();
+    writeln!(&mut autofile, "Comment=Manages an instance of RetroVeneer").unwrap();
+    writeln!(&mut autofile, "Exec={retroveneer_path}/retroveneer.appimage").unwrap();
+    writeln!(&mut autofile, "Icon={retroveneer_path}/retroveneer.png").unwrap();
     writeln!(&mut autofile, "Terminal=false").unwrap();
+    writeln!(&mut autofile, "Categories=Utility;Emulation;").unwrap();
+    writeln!(&mut autofile, "StartupNotify=true").unwrap();
 
     autofile.flush().unwrap();
 }
@@ -163,7 +165,7 @@ fn enable_autostart() {
 fn disable_autostart() {
     let homedir = format!("{}", dirs::home_dir().unwrap().display());
     let autostart_path = format!("{homedir}/.config/autostart");
-    let autostart_script = format!("{autostart_path}/retroveneer-ui.desktop");
+    let autostart_script = format!("{autostart_path}/retroveneer.desktop");
 
     fs::remove_file(autostart_script).unwrap();
 }
@@ -1457,24 +1459,30 @@ fn mode_update_everything(rl: &mut RaylibHandle, thread: &RaylibThread) {
 
 
 fn launch_platform_emulator() {
+    let homedir = format!("{}", dirs::home_dir().unwrap().display());
+
     loop {
         match glob_get_platform_selection() {
             PlatformSelection::CommanderX16 => {
-                let emu_path = "$HOME/retroveneer/emulators/x16emu/x16emu";
-                let fs_path = "$HOME/retroveneer/data/x16emu";
+                let emu_path = format!(
+                    "{homedir}/retroveneer/emulators/x16emu/x16emu");
+                let fs_path = format!(
+                    "{homedir}/retroveneer/data/x16emu");
 
                 let _ = Command::new("sh")
                     .arg("-c")
-                    .arg(format!("{} -fsroot {} -fullscreen", emu_path, fs_path))
+                    .arg(format!("{emu_path} -fsroot {fs_path} -fullscreen"))
                     .output();
             },
             PlatformSelection::Tic80 => {
-                let emu_path = "$HOME/retroveneer/emulators/tic80/usr/bin/tic80";
-                let fs_path = "$HOME/retroveneer/data/tic80";
+                let emu_path = format!(
+                    "{homedir}/retroveneer/emulators/tic80/tic80");
+                let fs_path = format!(
+                    "{homedir}/retroveneer/data/tic80");
 
                 let _ = Command::new("sh")
                     .arg("-c")
-                    .arg(format!("{} --fs={} --fullscreen", emu_path, fs_path))
+                    .arg(format!("{emu_path} --fullscreen --fs={fs_path}"))
                     .output();
             },
             PlatformSelection::Invalid => {},

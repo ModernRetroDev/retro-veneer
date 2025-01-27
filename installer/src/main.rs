@@ -91,32 +91,12 @@ fn get_emu_tic80() -> bool {
     let archive_fname: String;
     let relpath: &str = 
         "https://github.com/nesbox/TIC-80/releases/download/v1.1.2837/";
+    let pepath: &str = 
+        "https://github.com/ModernRetroDev/packaged-emulators/raw/refs/heads/master/tic80/";
 
     unsafe {
         STEP_NEXT = "Installing Emulator -- TIC-80...".to_string();
     }
-
-    //------------------------------------------------------------------------//
-    // Download a copy of the appropriate archive.                            //
-    //------------------------------------------------------------------------//
-    match std::env::consts::ARCH {
-        "x86_64" => {
-            archive_fname = "tic80-v1.1-linux.deb".to_string();
-        },
-        "aarch64" => {
-            archive_fname = "tic80-v1.1-rpi.deb".to_string();
-        },
-        _ => {
-            println!("Unsupported architecture! Aborting!!!");
-            return true;
-        }
-    }
-    archive_addr = format!("{}{}", relpath, archive_fname);
-
-    let _ = Command::new("sh")
-        .arg("-c")
-        .arg(format!("wget {}", archive_addr))
-        .output();
 
     //------------------------------------------------------------------------//
     // Make directory structure for this emulator.                            //
@@ -132,14 +112,6 @@ fn get_emu_tic80() -> bool {
         .output();
 
     //------------------------------------------------------------------------//
-    // Unpack emulator into aformentioned directory.                          //
-    //------------------------------------------------------------------------//
-    let _ = Command::new("sh")
-        .arg("-c")
-        .arg(format!("dpkg-deb -xv {} $HOME/retroveneer/emulators/tic80", archive_fname))
-        .output();
-
-    //------------------------------------------------------------------------//
     // Make a directory for emualtor archives.                                //
     //------------------------------------------------------------------------//
     let _ = Command::new("sh")
@@ -148,12 +120,80 @@ fn get_emu_tic80() -> bool {
         .output();
 
     //------------------------------------------------------------------------//
-    // Move the archive into the archives directory.                          //
+    // Download a copy of the appropriate archive.                            //
     //------------------------------------------------------------------------//
-    let _ = Command::new("sh")
-        .arg("-c")
-        .arg(format!("mv {} $HOME/retroveneer/emulators/archives", archive_fname))
-        .output();
+    match std::env::consts::ARCH {
+        "x86_64" => {
+            let binpath: &str = "$HOME/retroveneer/emulators/tic80/usr/bin";
+            archive_fname = "tic80-v1.1-linux.deb".to_string();
+            archive_addr = format!("{}{}", relpath, archive_fname);
+
+            let _ = Command::new("sh")
+                .arg("-c")
+                .arg(format!("wget {}", archive_addr))
+                .output();
+
+            //----------------------------------------------------------------//
+            // Unpack emulator into aformentioned directory.                  //
+            //----------------------------------------------------------------//
+            let _ = Command::new("sh")
+                .arg("-c")
+                .arg(format!(
+                    "dpkg-deb -xv {} $HOME/retroveneer/emulators/tic80",
+                    archive_fname))
+                .output();
+
+            let _ = Command::new("sh")
+                .arg("-c")
+                .arg(format!(
+                    "ln -s {binpath}/tic80 $HOME/retroveneer/emulators/tic80/tic80"))
+                .output();
+
+            //----------------------------------------------------------------//
+            // Move the archive into the archives directory.                  //
+            //----------------------------------------------------------------//
+            let _ = Command::new("sh")
+                .arg("-c")
+                .arg(format!("mv {} $HOME/retroveneer/emulators/archives",
+                    archive_fname))
+                .output();
+
+        },
+        "aarch64" => {
+            archive_fname = "tic80-linux-arm64.zip".to_string();
+            archive_addr = format!("{}{}", pepath, archive_fname);
+            let binpath: &str = "$HOME/retroveneer/emulators/tic80";
+            let archivepath: &str = "$HOME/retroveneer/emulators/archives";
+
+            let _ = Command::new("sh")
+                .arg("-c")
+                .arg(format!("wget {archive_addr}"))
+                .output();
+
+            //----------------------------------------------------------------//
+            // Unpack emulator into aformentioned directory.                  //
+            //----------------------------------------------------------------//
+            let _ = Command::new("sh")
+                .arg("-c")
+                .arg(format!(
+                    "unzip {} -d $HOME/retroveneer/emulators/tic80",
+                    archive_fname))
+                .output();
+
+
+            //----------------------------------------------------------------//
+            // Set the executable flag for the appimage.                      //
+            //----------------------------------------------------------------//
+            let _ = Command::new("sh")
+                .arg("-c")
+                .arg(format!("mv {archive_fname} {archivepath}"))
+                .output();
+        },
+        _ => {
+            println!("Unsupported architecture! Aborting!!!");
+            return true;
+        }
+    }
 
     return false;
 }
@@ -229,10 +269,8 @@ fn get_retroveneer() -> bool {
 
 fn setup_autostart() {
     let homedir = format!("{}", dirs::home_dir().unwrap().display());
-    println!("homedir = `{}`", homedir);
     let autostart_path = format!("{homedir}/.config/autostart");
 
-    println!("autostart_path = `{}`", autostart_path);
     fs::create_dir_all(&autostart_path).unwrap();
 
     let autostart_script = format!("{autostart_path}/retroveneer.desktop");
