@@ -1459,37 +1459,58 @@ fn mode_update_everything(rl: &mut RaylibHandle, thread: &RaylibThread) {
 
 
 fn launch_platform_emulator() {
-    let homedir = format!("{}", dirs::home_dir().unwrap().display());
+    let homedir  = format!("{}", dirs::home_dir().unwrap().display());
+    let temp_path = format!("{homedir}/retroveneer/.temp");
+    let emu_dir:  String;
+    let emu_name: String;
+    let fs_path:  String;
 
-    loop {
-        match glob_get_platform_selection() {
-            PlatformSelection::CommanderX16 => {
-                let emu_path = format!(
-                    "{homedir}/retroveneer/emulators/x16emu/x16emu");
-                let fs_path = format!(
-                    "{homedir}/retroveneer/data/x16emu");
+    fs::create_dir_all(&temp_path).unwrap();
 
-                let _ = Command::new("sh")
-                    .arg("-c")
-                    .arg(format!("{emu_path} -fsroot {fs_path} -fullscreen"))
-                    .output();
-            },
-            PlatformSelection::Tic80 => {
-                let emu_path = format!(
-                    "{homedir}/retroveneer/emulators/tic80/tic80");
-                let fs_path = format!(
-                    "{homedir}/retroveneer/data/tic80");
+    let launcher = format!("{temp_path}/launcher.sh");
 
-                let _ = Command::new("sh")
-                    .arg("-c")
-                    .arg(format!("{emu_path} --fullscreen --fs={fs_path}"))
-                    .output();
-            },
-            PlatformSelection::Invalid => {},
-        }
+    let mut file_launcher = File::create(&launcher).unwrap();
 
-        let _ = sleep(Duration::from_millis(1000));
+    writeln!(&mut file_launcher, "#!/usr/bin/env bash").unwrap();
+    writeln!(&mut file_launcher, "").unwrap();
+
+    match glob_get_platform_selection() {
+        PlatformSelection::CommanderX16 => {
+            emu_name = "x16emu".to_string();
+            emu_dir = format!("{homedir}/retroveneer/emulators/x16emu");
+            fs_path = format!("{homedir}/retroveneer/data/x16emu");
+
+            writeln!(&mut file_launcher, "cd {emu_dir}").unwrap();
+            writeln!(&mut file_launcher, "while :; do").unwrap();
+            writeln!(&mut file_launcher, 
+                "    ./{emu_name} -fsroot {fs_path} -fullscreen").unwrap();
+        },
+        PlatformSelection::Tic80 => {
+            emu_name = "tic80".to_string();
+            emu_dir = format!("{homedir}/retroveneer/emulators/tic80");
+            fs_path = format!("{homedir}/retroveneer/data/tic80");
+
+            writeln!(&mut file_launcher, "cd {emu_dir}").unwrap();
+            writeln!(&mut file_launcher, "while :; do").unwrap();
+            writeln!(&mut file_launcher, 
+                "    ./{emu_name} --fullscreen --fs={fs_path}").unwrap();
+        },
+        PlatformSelection::Invalid => {},
     }
+
+    writeln!(&mut file_launcher, "done").unwrap();
+
+    file_launcher.flush().unwrap();
+
+    let _ = Command::new("sh")
+        .arg("-c")
+        .arg(format!("chmod +x {launcher}"))
+        .output();
+
+    let _ = Command::new("sh")
+        .arg("-c")
+        .arg(format!("{launcher} &"))
+        .spawn();
 }
 
 fn launch_updated_installer() {
